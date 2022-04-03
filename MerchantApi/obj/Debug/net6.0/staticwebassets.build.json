@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "6rGcqvfmck1wd2cVOgDU8Iq7p/myhd8EU88vYpdHgG4=",
+  "Source": "MerchantApi",
+  "BasePath": "_content/MerchantApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
