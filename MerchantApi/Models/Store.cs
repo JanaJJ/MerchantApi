@@ -18,7 +18,8 @@ namespace MerchantApi.Models
 
         //Many to One Relationship with Merchant
         [Required]
-        public int MerchantId { get; set; }
-        public Merchant Merchant { get; set; }
+        public string MerchantCode { get; set; }
+        //public int MerchantId { get; set; }
+        //public Merchant Merchant { get; set; }
     }
 }

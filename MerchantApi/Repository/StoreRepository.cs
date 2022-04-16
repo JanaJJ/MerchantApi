@@ -1,4 +1,6 @@
-﻿using MerchantApi.Database;
+﻿using AutoMapper;
+using MerchantApi.Database;
+using MerchantApi.Dto;
 using MerchantApi.Models;
 
 namespace MerchantApi.Repository
@@ -6,16 +8,25 @@ namespace MerchantApi.Repository
     public class StoreRepository : IStoreRepository
     {
         private readonly Merchant_StoreDbContext _merchant_storeDbContext;
-        public StoreRepository(Merchant_StoreDbContext merchant_StoreDbContext)
+        private readonly IMapper _mapper;
+        public StoreRepository(Merchant_StoreDbContext merchant_StoreDbContext, IMapper mapper)
         {
             _merchant_storeDbContext = merchant_StoreDbContext;
+            _mapper = mapper;
         }
 
-        public void CreateStore(Store store)
+        public void CreateStore(StoreDto _store)
         {
-           _merchant_storeDbContext.Stores.Add(store);
+            var stores = _mapper.Map<Store>(_store);
+            _merchant_storeDbContext.Stores.Add(stores);
             _merchant_storeDbContext.SaveChanges();
         }
+        //public void CreateStore(StoreDto _store)
+        //{
+        //    var store = _mapper.Map<Store>(_store);
+        //    _merchantDbContext.Stores.Add(store);
+        //    _merchantDbContext.SaveChanges();
+        //}
 
         public bool DeleteStore(string storeCode)
         {

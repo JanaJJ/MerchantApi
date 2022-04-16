@@ -9,6 +9,7 @@ namespace MerchantApi.Dto
         public int StoreId { get; set; }
         [Required]
         public string StoreCode { get; set; }
+        public string MerchantCode { get; set; }
         [Required]
         public string StoreName { get; set; }
         public string Address { get; set; }

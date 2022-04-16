@@ -1,4 +1,5 @@
-﻿using MerchantApi.Models;
+﻿using MerchantApi.Dto;
+using MerchantApi.Models;
 using MerchantApi.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +22,18 @@ namespace MerchantApi.Controllers
             return _storeRepository.GetStores().ToList();
         }
         [HttpPost]
-        public ActionResult CreateStore([FromBody] Store store)
+        public ActionResult CreateStore([FromBody] StoreDto store)
         {
             _storeRepository.CreateStore(store);
             return Ok();
+        }
+        [HttpGet("{storeCode}")]
+        public ActionResult GetStorebyId([FromRoute] string storeCode)
+        {
+            var store=_storeRepository.GetStore(storeCode);
+         
+            return Ok(store); //200ok,found
+
         }
     }
 }

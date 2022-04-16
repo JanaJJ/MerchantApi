@@ -1,4 +1,5 @@
-﻿using MerchantApi.Models;
+﻿using MerchantApi.Dto;
+using MerchantApi.Models;
 
 namespace MerchantApi.Repository
 {
@@ -6,7 +7,7 @@ namespace MerchantApi.Repository
     {
         public IEnumerable<Store> GetStores();
         public Store GetStore(string storeCode);
-        public void CreateStore(Store store);
+        public void CreateStore(StoreDto store);
         public bool UpdateStore(string storeCode, Store store);
         public bool DeleteStore(string storeCode);
     }

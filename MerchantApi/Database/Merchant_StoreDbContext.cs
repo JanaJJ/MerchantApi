@@ -1,4 +1,6 @@
-﻿using MerchantApi.Models;
+﻿using MerchantApi.Dto;
+using MerchantApi.Models;
+using MerchantApi.Models.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace MerchantApi.Database

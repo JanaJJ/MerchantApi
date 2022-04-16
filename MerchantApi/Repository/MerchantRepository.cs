@@ -1,4 +1,6 @@
-﻿using MerchantApi.Database;
+﻿using AutoMapper;
+using MerchantApi.Database;
+using MerchantApi.Dto;
 using MerchantApi.Models;
 using MerchantApi.Models.Response;
 
@@ -7,9 +9,11 @@ namespace MerchantApi.Repository
     public class MerchantRepository : IMerchantRepository
     {
         private readonly Merchant_StoreDbContext _merchant_storeDbContext;
-        public MerchantRepository(Merchant_StoreDbContext merchant_StoreDbContext)
+        private readonly IMapper _mapper;
+        public MerchantRepository(Merchant_StoreDbContext merchant_StoreDbContext, IMapper mapper)
         {
             _merchant_storeDbContext = merchant_StoreDbContext;
+            _mapper = mapper;
         }
 
         //RETURN ALL,A LIST OF MERCHANTS
@@ -22,7 +26,7 @@ namespace MerchantApi.Repository
         public MerchantResponse GetMerchants(int page, string? firstName)
         {
             var defaultPageSize = 10f;
-            var merchants = _merchant_storeDbContext.Merchants.ToList();
+            var merchants = _mapper.Map<List<MerchantDto>>(_merchant_storeDbContext.Merchants.ToList());
 
             var pageCount = Math.Ceiling(merchants.Count / defaultPageSize);
 
@@ -34,14 +38,14 @@ namespace MerchantApi.Repository
 
             var merchantsPaged = merchants.Skip((page - 1) * (int)defaultPageSize).Take((int)defaultPageSize).ToList();
 
-            MerchantResponse studentResponse = new MerchantResponse
+            MerchantResponse merchantResponse = new MerchantResponse
             {
                 Merchant = merchantsPaged,
                 CurrentPage = page,
                 Pages = (int)pageCount
             };
 
-            return studentResponse;
+            return merchantResponse;
         }
 
         //GET MERCHANT BY ID
@@ -51,16 +55,10 @@ namespace MerchantApi.Repository
             return merchant;
         }
 
-        //CREATE MERCHANT   
-        //public void CreateMerchant(Merchant merchant)
-        //{
-        //    _merchant_storeDbContext.Merchants.Add(merchant);
-        //    _merchant_storeDbContext.SaveChanges();
-
-        //}
+        //CREATE MERCHANT
         public bool CreateMerchant(Merchant merchant)
         {
-            _merchant_storeDbContext.Add(merchant);
+            _merchant_storeDbContext.Merchants.Add(merchant);
             return Save();
         }
 
@@ -80,7 +78,7 @@ namespace MerchantApi.Repository
             merchantFromDb.Email = merchant.Email;
             merchantFromDb.Website = merchant.Website;
             merchantFromDb.AccountNum = merchant.AccountNum;
-            merchantFromDb.Stores = merchant.Stores;
+            
 
             _merchant_storeDbContext.SaveChanges();
             return true;
@@ -103,10 +101,11 @@ namespace MerchantApi.Repository
 
         
         //LIST STORES BY MERCHANT ID
-        public ICollection<Store> GetStoresbyMerchantCode(string merchantCode)
+        public ICollection<Store> GetStoresbyMerchantCode(string MerchantCode)
         {
-            return _merchant_storeDbContext.Stores.Where(e => e.Merchant.MerchantCode == merchantCode).ToList();
+            return _merchant_storeDbContext.Stores.Where(e => e.MerchantCode == MerchantCode).ToList();
         }
+       
 
         //SAVE
         public bool Save()
@@ -123,9 +122,9 @@ namespace MerchantApi.Repository
         }
 
         // UPDATE STORE
-        public bool UpdateStore(string merchantCode,string storeCode, Store store)
+        public bool UpdateStore(string MerchantCode,string storeCode, Store store)
         {
-            _merchant_storeDbContext.Stores.Where(e => e.Merchant.MerchantCode == merchantCode).ToList();
+            _merchant_storeDbContext.Stores.Where(e => e.MerchantCode == MerchantCode).ToList();
             var storeFromDb = _merchant_storeDbContext.Stores.Where(x => x.StoreCode == storeCode).FirstOrDefault();
             if (storeFromDb == null)
             {
@@ -141,17 +140,17 @@ namespace MerchantApi.Repository
         }
 
         // Retrieves information for a single store
-        public Store GetStoreInfo(string merchantCode,string storeCode)
+        public Store GetStoreInfo(string MerchantCode,string storeCode)
         {
-            _merchant_storeDbContext.Stores.Where(e => e.Merchant.MerchantCode == merchantCode).ToList();
+            _merchant_storeDbContext.Stores.Where(e => e.MerchantCode == MerchantCode).ToList();
             var store = _merchant_storeDbContext.Stores.Where(x => x.StoreCode == storeCode).FirstOrDefault();
             return store;
         }
 
         //Delete Store
-        public bool DeleteStore(string merchantCode, string storeCode)
+        public bool DeleteStore(string MerchantCode, string storeCode)
         {
-            _merchant_storeDbContext.Stores.Where(e => e.Merchant.MerchantCode == merchantCode).ToList();
+            _merchant_storeDbContext.Stores.Where(e => e.MerchantCode == MerchantCode).ToList();
             var store = _merchant_storeDbContext.Stores.Where(x => x.StoreCode == storeCode).FirstOrDefault();
 
             if (store == null)

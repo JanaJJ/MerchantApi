@@ -5,6 +5,7 @@ using MerchantApi.Models.Response;
 using MerchantApi.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
 namespace MerchantApi.Controllers
 {
@@ -25,36 +26,36 @@ namespace MerchantApi.Controllers
 
 
         [HttpGet]
-        //response  200
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Merchant>))]
+        ////response  200
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MerchantDto))]
         public ActionResult<MerchantResponse> GetMerchants([FromQuery] int? page, string? firstName)
         {
-            if (!page.HasValue || page == 0)
-                page = 1;
+           if (!page.HasValue || page == 0)
+               page = 1;
+            //if (!ModelState.IsValid)
+              //
+              //return BadRequest(ModelState);
 
-            return _merchantRepository.GetMerchants(page.Value, firstName);
+            var merchants = _merchantRepository.GetMerchants(page.Value, firstName);
+            return Ok(merchants);
         }
 
         //[HttpGet]
         //[ProducesResponseType(200, Type = typeof(IEnumerable<Merchant>))]
         //public ActionResult GetAllMerchants()
         //{
-        //    var merchants = _mapper.Map<List<MerchantDto>>(_merchantRepository.GetAll());
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-        //    return Ok();
+        //  var merchants = _mapper.Map<List<MerchantDto>>(_merchantRepository.GetAll());
+        //   if (!ModelState.IsValid)
+        //       return BadRequest(ModelState);
+        //   return Ok(merchants);
 
         //}
 
 
-        [HttpPost] 
+        [HttpPost]
         //responses 201 and 400
-        [ProducesResponseType(400)]
-        //public ActionResult CreateMerchant([FromBody]Merchant merchant)
-        //{
-        //   _merchantRepository.CreateMerchant(merchant);
-        //    return Ok();
-        //}
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(MerchantDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult CreateMerchant([FromBody] MerchantDto merchant)
         {
            var reviewMap=_mapper.Map<Merchant>(merchant);
@@ -66,78 +67,97 @@ namespace MerchantApi.Controllers
 
         //merchants/{merchant-code}:get
         //respones 200 and 404
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MerchantDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{merchantCode}")]
         public ActionResult GetMerchantbyId([FromRoute] string merchantCode)
         {
             var merchant = _mapper.Map<MerchantDto>(_merchantRepository.GetMerchant(merchantCode));
             if (merchant == null)
             {
-                return NotFound();
+                return NotFound(); //404 not found
             }
-            return Ok(merchant);
+            return Ok(merchant); //200ok,found
 
         }
 
         //merchants/{merchant-code}:put
         //responses 200 and 400
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MerchantDto))]
+        [ProducesResponseType(typeof(object), 400)]
         [HttpPut("{merchantCode}")]
         public ActionResult UpdateMerchant([FromRoute] string merchantCode, [FromBody] MerchantDto merchant)
         {
          
             var result = _mapper.Map<Merchant>(merchant);
-            _merchantRepository.UpdateMerchant(merchantCode, result);
-            return Ok();
-            //var result = _merchantRepository.UpdateMerchant(merchantCode, merchant);
-            //if (!result)
-            //{
-            //    return NotFound();
-            //}
-            //return Ok();
+            var updateMerchant=_merchantRepository.UpdateMerchant(merchantCode, result);
+            //if (!ModelState.IsValid)
+              //  return BadRequest(ModelState); //400 bad request
+            return Ok(updateMerchant); //200,ok
         }
 
         //merchants/{merchant-code}:delete
         //responses 200 and 400
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), 400)]
         [HttpDelete("{merchantCode}")]
         public ActionResult DeleteMerchant([FromRoute] string merchantCode)
         {
             var merchant = _merchantRepository.DeleteMerchant(merchantCode);
+            //if (!merchant)
+            //{
+             //   return NotFound();
+            //}
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState); //400
             if (!merchant)
             {
-                return NotFound();
+                ModelState.AddModelError("", "Something went wrong deleting merchant");
             }
-
-            return Ok();
+            return Ok(merchant); //200,ok
         }
 
         ///merchants/{merchant-code}/stores:get
         ///responses 200
         [HttpGet("{merchantCode}/stores")]
-        public ActionResult GetStoresByMerchantId(string merchantCode)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreDto))]
+        public ActionResult GetStoresByMerchantId([FromRoute] string merchantCode)
         {
-            var stores=_mapper.Map<List<StoreDto>>(_merchantRepository.GetStoresbyMerchantCode(merchantCode));
+            var stores=_merchantRepository.GetStoresbyMerchantCode(merchantCode);
             return Ok(stores); 
         }
+        
 
         ///merchants/{merchant-code}/stores:post
         ///responses 201 and 400
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("{merchantCode}/stores")]
-        public ActionResult CreateStoreFromMerchantCode([FromRoute] string merchantCode, [FromBody] StoreDto store)
+        public ActionResult CreateStoreFromMerchantCode([FromRoute] string MerchantCode, [FromBody] StoreDto store)
         {
-            var createStores = _mapper.Map<Store>(store);
-            createStores.Merchant=_merchantRepository.GetMerchant(merchantCode);
-            _merchantRepository.CreateStore(createStores);
+            //var createStores = _mapper.Map<Store>(store);
+            //createStores.Merchant = _merchantRepository.GetMerchant(MerchantCode);
+            //_storeRepository.CreateStore(createStores);
+            //if (!ModelState.IsValid)
+            //    return BadRequest(ModelState); //400
+            //return Ok();
+            _storeRepository.CreateStore(store);
             return Ok();
+
         }
+        
 
         ///merchants/{merchant-code}/stores/{store-code}:get
         ///200 and 404
         [HttpGet("{merchantCode}/stores/{storeCode}")]
-        public ActionResult GetStoreInfo([FromRoute] string merchantCode, [FromRoute] string storeCode)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult GetStoreInfo([FromRoute] string MerchantCode, [FromRoute] string storeCode)
         {
-            var store = _mapper.Map<StoreDto>(_merchantRepository.GetStoreInfo(merchantCode,storeCode));
+            var store = _mapper.Map<StoreDto>(_merchantRepository.GetStoreInfo(MerchantCode, storeCode));
             if (store == null)
             {
-                return NotFound();
+                return NotFound(); //404
             }
             return Ok(store);
         }
@@ -145,24 +165,31 @@ namespace MerchantApi.Controllers
         ///merchants/{merchant-code}/stores/{store-code}:put
         ///200 and 400
         [HttpPut("{merchantCode}/stores/{storeCode}")]
-        public ActionResult UpdateStore([FromRoute] string merchantCode, [FromRoute] string storeCode, [FromBody] StoreDto store)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StoreDto))]
+        [ProducesResponseType(typeof(object), 400)]
+        public ActionResult UpdateStore([FromRoute] string MerchantCode, [FromRoute] string storeCode, [FromBody] StoreDto store)
         {
             var result = _mapper.Map<Store>(store);
-            _merchantRepository.UpdateStore(merchantCode,storeCode,result);
+            _merchantRepository.UpdateStore(MerchantCode, storeCode,result);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState); //400
             return Ok();
         }
 
         ///merchants/{merchant-code}/stores/{store-code}:delete
         ///200 and 400
         [HttpDelete("{merchantCode}/stores/{storeCode}")]
-        public ActionResult DeleteStore([FromRoute] string merchantCode, [FromRoute] string storeCode)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), 400)]
+        public ActionResult DeleteStore([FromRoute] string MerchantCode, [FromRoute] string storeCode)
         {
-            var store = _merchantRepository.DeleteStore(merchantCode,storeCode);
+            var store = _merchantRepository.DeleteStore(MerchantCode, storeCode);
             if (!store)
             {
                 return NotFound();
             }
-
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             return Ok();
         }
 
