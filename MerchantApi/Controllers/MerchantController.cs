@@ -32,24 +32,11 @@ namespace MerchantApi.Controllers
         {
            if (!page.HasValue || page == 0)
                page = 1;
-            //if (!ModelState.IsValid)
-              //
-              //return BadRequest(ModelState);
 
             var merchants = _merchantRepository.GetMerchants(page.Value, firstName);
             return Ok(merchants);
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<Merchant>))]
-        //public ActionResult GetAllMerchants()
-        //{
-        //  var merchants = _mapper.Map<List<MerchantDto>>(_merchantRepository.GetAll());
-        //   if (!ModelState.IsValid)
-        //       return BadRequest(ModelState);
-        //   return Ok(merchants);
-
-        //}
 
 
         [HttpPost]
@@ -91,8 +78,8 @@ namespace MerchantApi.Controllers
          
             var result = _mapper.Map<Merchant>(merchant);
             var updateMerchant=_merchantRepository.UpdateMerchant(merchantCode, result);
-            //if (!ModelState.IsValid)
-              //  return BadRequest(ModelState); //400 bad request
+            if (!ModelState.IsValid)
+            return BadRequest(ModelState); //400 bad request
             return Ok(updateMerchant); //200,ok
         }
 
@@ -104,10 +91,7 @@ namespace MerchantApi.Controllers
         public ActionResult DeleteMerchant([FromRoute] string merchantCode)
         {
             var merchant = _merchantRepository.DeleteMerchant(merchantCode);
-            //if (!merchant)
-            //{
-             //   return NotFound();
-            //}
+            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState); //400
             if (!merchant)
@@ -135,12 +119,6 @@ namespace MerchantApi.Controllers
         [HttpPost("{merchantCode}/stores")]
         public ActionResult CreateStoreFromMerchantCode([FromRoute] string MerchantCode, [FromBody] StoreDto store)
         {
-            //var createStores = _mapper.Map<Store>(store);
-            //createStores.Merchant = _merchantRepository.GetMerchant(MerchantCode);
-            //_storeRepository.CreateStore(createStores);
-            //if (!ModelState.IsValid)
-            //    return BadRequest(ModelState); //400
-            //return Ok();
             _storeRepository.CreateStore(store);
             return Ok();
 

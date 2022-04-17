@@ -21,12 +21,7 @@ namespace MerchantApi.Repository
             _merchant_storeDbContext.Stores.Add(stores);
             _merchant_storeDbContext.SaveChanges();
         }
-        //public void CreateStore(StoreDto _store)
-        //{
-        //    var store = _mapper.Map<Store>(_store);
-        //    _merchantDbContext.Stores.Add(store);
-        //    _merchantDbContext.SaveChanges();
-        //}
+       
 
         public bool DeleteStore(string storeCode)
         {

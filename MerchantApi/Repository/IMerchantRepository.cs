@@ -5,7 +5,6 @@ namespace MerchantApi.Repository
 {
     public interface IMerchantRepository
     {
-        public ICollection<Merchant> GetAll();
         public MerchantResponse GetMerchants(int page,string? firstName);
         public Merchant GetMerchant(string merchantCode);
         bool CreateMerchant(Merchant merchant);

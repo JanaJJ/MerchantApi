@@ -16,11 +16,6 @@ namespace MerchantApi.Repository
             _mapper = mapper;
         }
 
-        //RETURN ALL,A LIST OF MERCHANTS
-        public ICollection<Merchant> GetAll()
-        {
-            return _merchant_storeDbContext.Merchants.ToList();
-        }
 
         // RETURN ALL MERCHANTS
         public MerchantResponse GetMerchants(int page, string? firstName)
